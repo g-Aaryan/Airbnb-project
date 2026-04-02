@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 type Serveconfig ={
-    PORT:number
+    PORT:number,
+    REDIS_PORT?: number,
+    REDIS_HOST?: string,
 }
 
 function loadenv(){
@@ -11,5 +13,7 @@ function loadenv(){
 loadenv();
 
 export const serverconfig:Serveconfig={
-    PORT:Number(process.env.PORT)||3001
+    PORT:Number(process.env.PORT)||3001,
+    REDIS_PORT: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379,
+    REDIS_HOST: process.env.REDIS_HOST || 'localhost',
 }
