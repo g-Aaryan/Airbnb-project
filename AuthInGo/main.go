@@ -2,16 +2,15 @@ package main
 
 import (
 	"AuthInGo/app"
+	config "AuthInGo/config/env"
 )
 
 func main() {
 
-	cfg := app.Config{
-		Addr: ":3001",
-	}
-	app := app.Application{
-		Config: cfg,
-	}
+	config.Load()
+
+	cfg := app.NewConfig() // Set the server to listen on port 8080
+	app := app.NewApplication(cfg)
 
 	app.Run()
 }
