@@ -2,22 +2,64 @@ package db
 
 import (
 	"fmt"
+	"AuthInGo/models"
+	"database/sql"
+
 )
 
 type UserRepository interface {
-		Create() error
+	Create() error
+	GetByID() (*models.User, error)
+	GetAll() ([]*models.User, error)
+	DeleteByID(id int64) error
 }
 
-type UserRepositoryImpl struct {}
+type UserRepositoryImpl struct{
+	db *sql.DB
+}
 
-
-func NewUserRepository() UserRepository {
+func NewUserRepository(_db *sql.DB) UserRepository {
 	return &UserRepositoryImpl{
-		// db: db,
-	}
-} // constructor make only one time use multiple time 
+	db: _db,	}
+} // constructor make only one time use multiple time
+
+func (u *UserRepositoryImpl) GetAll() ([]*models.User, error) {
+	return nil, nil
+}
+
+func (u *UserRepositoryImpl) DeleteByID(id int64) error {
+	return nil
+}
 
 func (u *UserRepositoryImpl) Create() error {
 	fmt.Println("Creating user in UserRepository")
 	return nil
+}
+
+
+func (u *UserRepositoryImpl) GetByID() (*models.User, error) {
+		fmt.Println("Fetching user in UserRepository")
+
+		query := "SELECT id, username, email, created_at, updated_at FROM users WHERE id = ?"
+
+		row := u.db.QueryRow(query, 1)
+
+		user := &models.User{}
+
+		err := row.Scan(&user.Id, &user.Username, &user.Email, &user.CreatedAt, &user.UpdatedAt)
+
+		if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("No user found with the given ID")
+			return nil, err
+		} else {
+			fmt.Println("Error scanning user:", err)
+			return nil, err
+		}
+	}
+
+	fmt.Println("User fetched successfully:", user)
+
+	return user, nil
+
 }
