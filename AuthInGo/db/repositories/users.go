@@ -32,7 +32,29 @@ func (u *UserRepositoryImpl) DeleteByID(id int64) error {
 }
 
 func (u *UserRepositoryImpl) Create() error {
-	fmt.Println("Creating user in UserRepository")
+	query := "INSERT INTO users (username, email, password) VALUES (?, ?, ?)"
+
+	result, err := u.db.Exec(query, "testuser", "test@test.com", "password123")
+
+	if err != nil {
+		fmt.Println("Error inserting user:", err)
+		return err
+	}
+
+	rowsAffected, rowErr := result.RowsAffected()
+
+	if rowErr != nil {
+		fmt.Println("Error getting rows affected:", rowErr)
+		return rowErr
+	}
+
+	if rowsAffected == 0 {
+		fmt.Println("No rows were affected, user not created")
+		return nil
+	}
+
+	fmt.Println("User created successfully, rows affected:", rowsAffected)
+
 	return nil
 }
 
