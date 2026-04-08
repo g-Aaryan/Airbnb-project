@@ -7,6 +7,11 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
+
+
+// setup the database connection using the configuration parameters from the environment variables.
+// The SetupDB function is responsible for initializing and configuring the database layer of the application.	
+
 func SetupDB() (*sql.DB, error) {
 	cfg := mysql.NewConfig()
 	cfg.User = env.GetString("DB_USER", "root")

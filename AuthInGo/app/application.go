@@ -13,32 +13,40 @@ import (
 	"time"
 )
 
-// Config holds the configuration for the server.
+// configuration for the server
 type Config struct {
-	Addr string // PORT
+	Addr string 
 }
 
+
+// app initialization and server setup
 type Application struct {
 	Config Config
 }
 
 // Constructor for Config
+// copy is cheap in go so we can return by value and it will not cause any performance issues
 func NewConfig() Config {
 
 	port := config.GetString("PORT", ":8080")
-
 	return Config{
 		Addr: port,
 	}
 }
 
 // Constructor for Application
+// return by pointer to avoid copying the entire struct and to allow for modifications to the Application instance if needed in the future.
+//  It also allows for better performance when the struct is large, as it avoids unnecessary copying of data.
 func NewApplication(cfg Config) *Application {
 	return &Application{
 		Config: cfg,
 	}
 }
 
+
+// member function to run the server and handle incoming requests. 
+// It sets up the database connection, initializes the repositories, services, and controllers, and starts the HTTP server with the configured router.
+//  It also includes error handling for database setup and server startup.
 func (app *Application) Run() error {
 
 	db, err := dbConfig.SetupDB()

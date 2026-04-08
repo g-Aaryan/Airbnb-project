@@ -13,7 +13,10 @@ func Load() {
 	if err != nil {
 		fmt.Println("Error loading .env file")
 	}
-}
+} // reads the .env file and loads the environment variables into the application. 
+
+
+// retrieve environment variables with a fallback option.
 func GetString(key string, fallback string) string {
 	value, ok := os.LookupEnv(key)
 	if !ok {
@@ -22,6 +25,8 @@ func GetString(key string, fallback string) string {
 	return value
 }
 
+
+// retrieve environment variables with a fallback option and convert them to the appropriate type (int or bool).
 func GetInt(key string, fallback int) int {
 	value, ok := os.LookupEnv(key)
 	if !ok {

@@ -7,22 +7,29 @@ import (
 
 )
 
-type UserRepository interface {
+// interface defining the methods for user repository, including Create, GetByID, GetAll, and DeleteByID.
+type UserRepository interface {  
 	Create() error
 	GetByID() (*models.User, error)
 	GetAll() ([]*models.User, error)
 	DeleteByID(id int64) error
 }
 
+
+// actual implementation of the UserRepository interface, which interacts with the database to perform CRUD operations on user data.
 type UserRepositoryImpl struct{
 	db *sql.DB
 }
 
+
+// constructor function for the UserRepositoryImpl struct, which takes a database connection as an argument and returns a new instance of the UserRepository interface.
 func NewUserRepository(_db *sql.DB) UserRepository {
 	return &UserRepositoryImpl{
 	db: _db,	}
 } // constructor make only one time use multiple time
 
+
+// A type implement an interface only if it has all the methods defined in the interface.
 func (u *UserRepositoryImpl) GetAll() ([]*models.User, error) {
 	return nil, nil
 }
