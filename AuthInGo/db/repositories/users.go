@@ -9,7 +9,7 @@ import (
 
 // interface defining the methods for user repository, including Create, GetByID, GetAll, and DeleteByID.
 type UserRepository interface {  
-	Create() error
+	Create(username string, email string, hashedPassword string) error
 	GetByID() (*models.User, error)
 	GetAll() ([]*models.User, error)
 	DeleteByID(id int64) error
@@ -38,16 +38,20 @@ func (u *UserRepositoryImpl) DeleteByID(id int64) error {
 	return nil
 }
 
-func (u *UserRepositoryImpl) Create() error {
+func (u *UserRepositoryImpl) Create(username string, email string, hashedPassword string) error {
+
+	// step 1 u need to prepare the query  
 	query := "INSERT INTO users (username, email, password) VALUES (?, ?, ?)"
 
-	result, err := u.db.Exec(query, "testuser", "test@test.com", "password123")
+
+	// step 2 execute the query with the provided parameters and handle any errors that may occur during the execution.
+	result, err := u.db.Exec(query, username, email, hashedPassword)
 
 	if err != nil {
 		fmt.Println("Error inserting user:", err)
 		return err
 	}
-
+	// step 3 check the number of rows affected by the query execution to ensure that the user was created successfully and handle any errors that may occur during this process as well.
 	rowsAffected, rowErr := result.RowsAffected()
 
 	if rowErr != nil {
