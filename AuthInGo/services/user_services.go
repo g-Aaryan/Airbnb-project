@@ -9,7 +9,7 @@ import (
 type UserService interface {
 	GetUserById() error
 	CreateUser() error
-	LoginUser() error
+	LoginUser() (string, error)
 }
 
 type UserServiceImpl struct {
@@ -44,8 +44,43 @@ func (u *UserServiceImpl) CreateUser() error {
 	return nil
 }
 
-func (u *UserServiceImpl) LoginUser() error {
-	response := utils.CheckPasswordHash("example_password_wrong", "")
-	fmt.Println("Login response:", response)
-	return nil
+func (u *UserServiceImpl) LoginUser() (string, error) {
+	email := "user@gmail.com"
+	password := "password123"
+
+	user, err := u.userRepository.GetByEmail(email)
+	if err != nil {
+		fmt.Println("Error fetching user by email:", err)
+		return "", err
+	}
+
+	if user == nil {
+		fmt.Println("User not found with email:", email)
+		return "", fmt.Errorf("user not found")
+	}
+
+	isPasswordValid := utils.CheckPasswordHash(password, user.Password)
+
+	if !isPasswordValid {
+		fmt.Println("Invalid password for user with email:", email)
+		return "", fmt.Errorf("invalid password")
+	}
+
+		payload := jwt.MapClaims{
+		"email": user.Email,
+		"id":    user.Id,
+	}
+
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload) 
+		tokenString, err := token.SignedString([]byte(env.GetString("JWT_SECRET", "TOKEN")))
+
+		if err != nil {
+			fmt.Println("Error signing token:", err)
+			return "", err
+		}
+
+		fmt.Println("JWT Token:", tokenString)
+
+	return tokenString, nil
+
 }
