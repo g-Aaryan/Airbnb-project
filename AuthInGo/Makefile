@@ -9,7 +9,7 @@ migrate-up: # -> make migrate-up
 	goose -dir $(MIGRATIONS_FOLDER) mysql "$(DB_URL)" up
 
 migrate-down: # -> make migrate-down
-	goose -dir $(MIGRATIONS_FOLDER) mysql "$(DB_URL)" down
+	goose -dir $(MIGRATIONS_FOLDER) mysql "$(DB_URL) down
 
 # Rollback all migrations and reset database # make migrate-reset
 migrate-reset:

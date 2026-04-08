@@ -4,12 +4,13 @@ import (
 	db "AuthInGo/db/repositories"
 	"fmt"
 	"AuthInGo/utils"
+	"AuthInGo/dto"
 )
 
 type UserService interface {
 	GetUserById() error
 	CreateUser() error
-	LoginUser() (string, error)
+	LoginUser(payload *dto.LoginUserRequestDTO) (string, error)
 }
 
 type UserServiceImpl struct {
@@ -44,9 +45,9 @@ func (u *UserServiceImpl) CreateUser() error {
 	return nil
 }
 
-func (u *UserServiceImpl) LoginUser() (string, error) {
-	email := "user@gmail.com"
-	password := "password123"
+func (u *UserServiceImpl) LoginUser(payload *dto.LoginUserRequestDTO) (string, error) {
+	email := payload.Email
+	password := payload.Password
 
 	user, err := u.userRepository.GetByEmail(email)
 	if err != nil {
@@ -66,12 +67,12 @@ func (u *UserServiceImpl) LoginUser() (string, error) {
 		return "", fmt.Errorf("invalid password")
 	}
 
-		payload := jwt.MapClaims{
+		jwtpayload := jwt.MapClaims{
 		"email": user.Email,
 		"id":    user.Id,
 	}
 
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload) 
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtpayload) 
 		tokenString, err := token.SignedString([]byte(env.GetString("JWT_SECRET", "TOKEN")))
 
 		if err != nil {
