@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"AuthInGo/utils"
 	"AuthInGo/dto"
+	"AuthInGo/models"
+	"github.com/golang-jwt/jwt/v5"
+	env "AuthInGo/config/env"
 )
 
 type UserService interface {
-	GetUserById() error
-	CreateUser() error
+	GetUserById(id string) (*models.User, error)
+	CreateUser(payload *dto.CreateUserRequestDTO) (*models.User, error)
 	LoginUser(payload *dto.LoginUserRequestDTO) (string, error)
 }
 
@@ -23,26 +26,33 @@ func NewUserService(_userRepository db.UserRepository) UserService {
 	}
 } // this is di here loose coupling between service and repository layer and we can easily swap the implementation if needed in the future without changing the service layer code.
 
-func (u *UserServiceImpl) GetUserById() error {
+func (u *UserServiceImpl) GetUserById(id string) (*models.User, error) {
 	fmt.Println("Fetching user in UserService")
-	u.userRepository.Create()
-	return nil
+	user, err := u.userRepository.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
-func (u *UserServiceImpl) CreateUser() error {
+func (u *UserServiceImpl) CreateUser(payload *dto.CreateUserRequestDTO) (*models.User, error) {
 	fmt.Println("Creating user in UserService")
-	password := "password123"
+	password := payload.Password
 	hash, err := utils.HashPassword(password)
 	if err != nil {
-		return err
+		return nil,err
 	}
-	u.userRepository.Create(
-		"username1",
-		"user@gmail.com",
+	user, err := u.userRepository.Create(
+		payload.Username,
+		payload.Email,
 		hash,
 
 	)
-	return nil
+	if err != nil {
+		fmt.Println("Error creating user:", err)	
+		return nil, err
+	}
+	return user, nil
 }
 
 func (u *UserServiceImpl) LoginUser(payload *dto.LoginUserRequestDTO) (string, error) {

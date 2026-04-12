@@ -9,8 +9,8 @@ import (
 
 // interface defining the methods for user repository, including Create, GetByID, GetAll, and DeleteByID.
 type UserRepository interface {  
-	Create(username string, email string, hashedPassword string) error
-	GetByID() (*models.User, error)
+	Create(username string, email string, hashedPassword string) (*models.User, error)
+	GetByID(id string) (*models.User, error)
 	GetAll() ([]*models.User, error)
 	GetByEmail(email string) (*models.User, error)
 	DeleteByID(id int64) error
@@ -32,14 +32,54 @@ func NewUserRepository(_db *sql.DB) UserRepository {
 
 // A type implement an interface only if it has all the methods defined in the interface.
 func (u *UserRepositoryImpl) GetAll() ([]*models.User, error) {
-	return nil, nil
+	query := "SELECT id, username, email, created_at, updated_at FROM users"
+	rows, err := u.db.Query(query)
+	if err != nil {
+		fmt.Println("Error fetching users:", err)
+		return nil, err
+	}
+	defer rows.Close() // rows are closed 
+
+	var users []*models.User
+	for rows.Next() {
+		user := &models.User{}
+		err := rows.Scan(&user.Id, &user.Username, &user.Email, &user.CreatedAt, &user.UpdatedAt)
+		if err != nil {
+			fmt.Println("Error scanning user:", err)
+			return nil, err
+		}
+		users = append(users, user)
+	}
+	err = rows.Err()
+	if err != nil {
+		fmt.Println("Error iterating over users:", err)
+		return nil, err
+	}
+	return users, nil
 }
 
 func (u *UserRepositoryImpl) DeleteByID(id int64) error {
+	query := "DELETE FROM users WHERE id = ?"
+	result, err := u.db.Exec(query, id)	
+	if err != nil {
+		fmt.Println("Error deleting user:", err)
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		fmt.Println("Error getting rows affected:", err)
+		return err
+	}
+	if rowsAffected == 0 {
+		fmt.Println("No user found with the given ID to delete")
+		return nil
+	}
+	fmt.Println("User deleted successfully, rows affected:", rowsAffected)
 	return nil
+
 }
 
-func (u *UserRepositoryImpl) Create(username string, email string, hashedPassword string) error {
+func (u *UserRepositoryImpl) Create(username string, email string, hashedPassword string) (*models.User, error) {
 
 	// step 1 u need to prepare the query  
 	query := "INSERT INTO users (username, email, password) VALUES (?, ?, ?)"
@@ -49,34 +89,44 @@ func (u *UserRepositoryImpl) Create(username string, email string, hashedPasswor
 	result, err := u.db.Exec(query, username, email, hashedPassword)
 
 	if err != nil {
-		fmt.Println("Error inserting user:", err)
-		return err
+		fmt.Println("Error creating user:", err)
+		return nil, err
 	}
 	// step 3 check the number of rows affected by the query execution to ensure that the user was created successfully and handle any errors that may occur during this process as well.
 	rowsAffected, rowErr := result.RowsAffected()
 
 	if rowErr != nil {
 		fmt.Println("Error getting rows affected:", rowErr)
-		return rowErr
+		return nil, rowErr
 	}
-
-	if rowsAffected == 0 {
-		fmt.Println("No rows were affected, user not created")
-		return nil
+	id, err := result.LastInsertId()
+	if err != nil {
+		fmt.Println("Error getting last insert ID:", err)
+		return nil, err
 	}
 
 	fmt.Println("User created successfully, rows affected:", rowsAffected)
 
-	return nil
+	user := &models.User{
+		Id:       id, // get the last inserted id from the result of the query execution
+		Username: username,
+		Email:    email,
+	}
+
+
+
+	fmt.Println("User created successfully",user)
+
+	return user, nil
 }
 
 
-func (u *UserRepositoryImpl) GetByID() (*models.User, error) {
+func (u *UserRepositoryImpl) GetByID(id string) (*models.User, error) {
 		fmt.Println("Fetching user in UserRepository")
 
 		query := "SELECT id, username, email, created_at, updated_at FROM users WHERE id = ?"
 
-		row := u.db.QueryRow(query, 1)
+		row := u.db.QueryRow(query, id)
 
 		user := &models.User{}
 
@@ -92,7 +142,7 @@ func (u *UserRepositoryImpl) GetByID() (*models.User, error) {
 		}
 	}
 
-	fmt.Println("User fetched successfully:", user)
+	fmt.Println("User fetched successfully:")
 
 	return user, nil
 
@@ -113,6 +163,7 @@ func (u *UserRepositoryImpl) GetByEmail(email string) (*models.User, error) {
 		} else {
 			fmt.Println("Error scanning user:", err)
 			return nil, err
+		}
 	}
 	return user, nil
 
