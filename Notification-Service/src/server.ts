@@ -5,6 +5,7 @@ import v2router from './router/v2/index.router';
 import { genericErrorHandler } from './middlewares/error.middleware';
 import logger from './config/logger.config';
 import { attachCorrelationIdMiddleware } from './middlewares/correlation.middleware';
+import { setupmailerworker } from './processors/email.processor';
 const app = express();
 
 app.use(express.json());
@@ -18,4 +19,7 @@ app.use(genericErrorHandler);
 
 app.listen(serverconfig.PORT,()=>{
     logger.info(`server is listening on the port ${serverconfig.PORT}`);
+    setupmailerworker(); 
+    logger.info(`Mailer worker setup completed.`);
+
 })
