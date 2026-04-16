@@ -1,5 +1,7 @@
 import { QueryInterface } from 'sequelize';
 
+//npx sequelize-cli migration:generate --name create-users-table
+
 export default {
   async up (queryInterface:QueryInterface) {
     await queryInterface.sequelize.query(`

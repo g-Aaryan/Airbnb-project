@@ -44,13 +44,16 @@ export async function getAllHotel() {
 
 }
 
-export async function deleteHotel(id:number) {
+export async function softDeleteHotel(id: number) {
     const hotel = await Hotel.findByPk(id);
 
-    if (!hotel) {
-        logger.error('Hotel doesnt even exist')
-        throw new NotFoundError('Hotel doesnt even exist')
+    if(!hotel) {
+        logger.error(`Hotel not found: ${id}`);
+        throw new NotFoundError(`Hotel with id ${id} not found`);
     }
 
-    await hotel.destroy();
+    hotel.deletedAt = new Date();
+    await hotel.save(); // Save the changes to the database
+    logger.info(`Hotel soft deleted: ${hotel.id}`);
+    return true;
 }

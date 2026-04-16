@@ -1,5 +1,7 @@
 const dotenv = require('dotenv');
 
+// config.js file is used to load environment variables from a .env file and export the database configuration for Sequelize
+
 dotenv.config();
 const config = {
   development: {

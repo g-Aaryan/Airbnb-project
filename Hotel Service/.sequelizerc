@@ -1,9 +1,15 @@
 const path = require('path');
 
+// .sequelizerc file is used to specify the paths for seeders, models, migrations, and config for Sequelize CLI
+// This allows us to keep our project organized and maintain a clean structure for our database-related files
+
 module.exports = {
     seedersPath: path.resolve('./src/db/seeders'),
     modelsPath: path.resolve('./src/db/models'),
     migrationsPath: path.resolve('./src/db/migrations'),
     config: path.resolve('./src/config/sequelize.config.js'),
 }
+
+
+
 

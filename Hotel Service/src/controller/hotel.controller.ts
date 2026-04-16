@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createHotelService, deleteHotelService, getAllHotelService, getHotelByIdService } from "../services/hotel.service";
+import { createHotelService, softDeleteHotelService, getAllHotelService, getHotelByIdService } from "../services/hotel.service";
 // import { success } from "zod";
 
 export async function createHotelHandler(req: Request, res: Response, next: NextFunction) {
@@ -41,7 +41,7 @@ export async function getAllHotelsHandler(req: Request, res: Response, next: Nex
 }
 
 export async function deleteHotelHandler(req: Request, res: Response, next: NextFunction) {
-    await deleteHotelService(Number(req.params.id))
+    await softDeleteHotelService(Number(req.params.id))
     res.status(200).json({
          message: "Successfully deleted"
     });
