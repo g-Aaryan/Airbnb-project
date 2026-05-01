@@ -2,6 +2,8 @@ package middlewares
 
 import (
 	"net/http"
+	dbConfig "AuthInGo/config/db"
+	repo "AuthInGo/db/repositories"
 	"strings"
 	"github.com/golang-jwt/jwt/v5"
 	env "AuthInGo/config/env"
@@ -62,4 +64,47 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
 
 
 	})
+}
+
+func RequireAllRoles(roles ...string) func(http.Handler) http.Handler {
+
+	// function that can create a middleware for checking the above set of roles
+
+	return func(next http.Handler) http.Handler {
+
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			userIdStr := r.Context().Value("userID").(string)
+			userId, err := strconv.ParseInt(userIdStr, 10, 64)
+			if err != nil {
+				http.Error(w, "Invalid user ID", http.StatusUnauthorized)
+				return
+			}
+
+			dbConn, dbErr := dbConfig.SetupDB()
+			if dbErr != nil {
+				http.Error(w, "Database connection error: "+dbErr.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			urr := repo.NewUserRoleRepository(dbConn)
+
+			hasAllRoles, hasAllRolesErr := urr.HasAllRoles(userId, roles)
+
+			if hasAllRolesErr != nil {
+				http.Error(w, "Error checking user roles: "+hasAllRolesErr.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			if !hasAllRoles {
+				http.Error(w, "Forbidden: You do not have the required roles", http.StatusForbidden)
+				return
+			}
+
+			fmt.Println("User has all required roles:", roles)
+
+			next.ServeHTTP(w, r)
+		})
+	}
+
 }
