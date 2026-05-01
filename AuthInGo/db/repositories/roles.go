@@ -20,7 +20,7 @@ type RoleRepositoryImpl struct {
 
 func NewRoleRepository(_db *sql.DB) RoleRepository {
 	return &RoleRepositoryImpl{
-		db: _db
+		db: _db,
 	}
 }
 
@@ -125,3 +125,4 @@ func (r *RoleRepositoryImpl) UpdateRole(id int64, name string, description strin
 		UpdatedAt:   "", // You can set this to the current timestamp if needed
 	}, nil
 }
+

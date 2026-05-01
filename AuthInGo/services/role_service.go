@@ -61,3 +61,12 @@ func (s *RoleServiceImpl) GetRolePermissions(roleId int64) ([]*models.RolePermis
 
 func (s *RoleServiceImpl) AddPermissionToRole(roleId int64, permissionId int64) (*models.RolePermission, error) {
 	return s.rolePermissionRepository.AddPermissionToRole(roleId, permissionId)
+}
+
+func (s *RoleServiceImpl) RemovePermissionFromRole(roleId int64, permissionId int64) error {
+	return s.rolePermissionRepository.RemovePermissionFromRole(roleId, permissionId)
+}
+
+func (s *RoleServiceImpl) GetAllRolePermissions() ([]*models.RolePermission, error) {
+	return s.rolePermissionRepository.GetAllRolePermissions()
+}
