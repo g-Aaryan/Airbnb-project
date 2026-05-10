@@ -20,15 +20,14 @@ app.use(genericErrorHandler);
 
 app.listen(serverconfig.PORT,()=>{
     logger.info(`server is listening on the port ${serverconfig.PORT}`);
-    for(let i = 15; i < 20; i++) {
+  
         addEmailToQueue({
-            to: `sample from booking ${i}`,
+            to: "coderh70@gmail.com",
             subject: "Sample Email booking",
-            templateId: "sample-template",
+            templateId: "welcome",
             params: {
-                name: "hehe",
-                orderId: "12345",
+                name: "John Doe",
+                appName: "Booking Service"
             }
         })
-    }
 })

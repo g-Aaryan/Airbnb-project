@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { createHotelService, softDeleteHotelService, getAllHotelService, getHotelByIdService } from "../services/hotel.service";
-// import { success } from "zod";
+import { createHotelService, deleteHotelService, getAllHotelsService, getHotelByIdService } from "../services/hotel.service";
+import { StatusCodes } from "http-status-codes";
 
 export async function createHotelHandler(req: Request, res: Response, next: NextFunction) {
     // 1. Call the service layer
@@ -9,7 +9,7 @@ export async function createHotelHandler(req: Request, res: Response, next: Next
 
     // 2. Send the response
 
-    res.status(201).json({
+    res.status(StatusCodes.CREATED).json({
         message: "Hotel created successfully",
         data: hotelResponse,
         success: true,
@@ -23,7 +23,7 @@ export async function getHotelByIdHandler(req: Request, res: Response, next: Nex
 
     // 2. Send the response
 
-    res.status(200).json({
+    res.status(StatusCodes.OK).json({
         message: "Hotel found successfully",
         data: hotelResponse,
         success: true,
@@ -31,24 +31,37 @@ export async function getHotelByIdHandler(req: Request, res: Response, next: Nex
 }
 
 export async function getAllHotelsHandler(req: Request, res: Response, next: NextFunction) {
-    const hotelResponse = await getAllHotelService();
-    res.status(200).json({
-        message:"Here are the all hotels",
-        data:hotelResponse,
-        success:true
+
+    // 1. Call the service layer
+
+    const hotelsResponse = await getAllHotelsService();
+
+    // 2. Send the response
+    res.status(StatusCodes.OK).json({
+        message: "Hotels found successfully",
+        data: hotelsResponse,
+        success: true,
     });
 
 }
 
 export async function deleteHotelHandler(req: Request, res: Response, next: NextFunction) {
-    await softDeleteHotelService(Number(req.params.id))
-    res.status(200).json({
-         message: "Successfully deleted"
+
+    // 1. Call the service layer
+
+    const hotelsResponse = await deleteHotelService(Number(req.params.id));
+
+    // 2. Send the response
+    res.status(StatusCodes.OK).json({
+        message: "Hotels deleted successfully",
+        data: hotelsResponse,
+        success: true,
     });
+    
 }
 
 export async function updateHotelHandler(req: Request, res: Response, next: NextFunction) {
-    
-    res.status(501);
+
+    res.status(StatusCodes.NOT_IMPLEMENTED);
     
 }

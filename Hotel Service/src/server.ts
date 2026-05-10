@@ -6,6 +6,8 @@ import { AppErrorHandler, genericErrorHandler } from './middlewares/error.middle
 import logger from './config/logger.config';
 import { attachCorrelationIdMiddleware } from './middlewares/correlation.middleware';
 import sequelize from './db/models/sequelize';
+import { setupRoomGenerationWorker } from './processors/roomGeneration.processor';
+import { startScheduler } from './scheduler/room.scheduler';
 const app = express();
 
 app.use(express.json());
@@ -18,8 +20,14 @@ app.use(AppErrorHandler)
 app.use(genericErrorHandler);
 
 
+
+
 app.listen(serverconfig.PORT,async()=>{
     logger.info(`server is listening on the port ${serverconfig.PORT}`);
     await sequelize.authenticate();
     logger.info('Database connection has been established successfully.');
+
+    setupRoomGenerationWorker();
+    startScheduler();
+    logger.info('Room availability extension scheduler initialized');
 })

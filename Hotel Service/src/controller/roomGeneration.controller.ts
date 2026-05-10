@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { generateRooms } from "../services/roomGeneration.service";
 
 export async function generateRoomHandler(req: Request, res: Response) {

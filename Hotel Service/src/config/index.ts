@@ -1,6 +1,9 @@
 import dotenv from 'dotenv';
 type Serveconfig ={
     PORT:number
+    REDIS_PORT?: number,
+    REDIS_HOST?: string,
+    ROOM_CRON: string,
 }
 
 type DBConfig = {
@@ -18,7 +21,10 @@ function loadenv(){
 loadenv();
 
 export const serverconfig:Serveconfig={
-    PORT:Number(process.env.PORT)||3001
+    PORT:Number(process.env.PORT)||3001,
+    REDIS_PORT:Number(process.env.REDIS_PORT)||6379,
+    REDIS_HOST: process.env.REDIS_HOST || 'localhost',
+    ROOM_CRON: process.env.ROOM_CRON || '0 0 * * *'
 }
 
 export const dbConfig: DBConfig = {
