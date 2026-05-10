@@ -1,4 +1,4 @@
-import { CreationAttributes } from "sequelize";
+import { CreationAttributes, Op } from "sequelize";
 import Room from "../db/models/room";
 import BaseRepository from "./base.repository";
 
@@ -55,4 +55,23 @@ export class RoomRepository extends BaseRepository<Room> {
             latestDate: new Date(result.latestDate)
         }));
     }
+
+    async findbyroomCategoryIdAndDaterange(
+    roomCategoryId: number,
+    startDate: Date,
+    endDate: Date
+) {
+    return await this.model.findAll({
+        where: {
+            roomCategoryId,
+            bookingId: null,
+            dateOfAvailability: {
+                [Op.between]: [startDate, endDate]
+            },
+            deletedAt: null
+        }
+    });
 }
+}
+
+
