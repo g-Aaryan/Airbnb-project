@@ -1,8 +1,9 @@
-import { findbyroomCategoryIdAndDaterangeHandler } from "../../controller/room.controller";
-import { validateRequestBody } from "../../validators";
-import { getAvailableRoomsValidationschema } from "../../validators/room.validator";
+import { findbyroomCategoryIdAndDaterangeHandler, updatebookingHandler } from "../../controller/room.controller";
+import { validateQueryParams, validateRequestBody } from "../../validators";
+import { getAvailableRoomsValidationschema, updatebookingValidationschema } from "../../validators/room.validator";
 
 const roomRouter = require("express").Router();
-roomRouter.get("/available", validateRequestBody(getAvailableRoomsValidationschema),findbyroomCategoryIdAndDaterangeHandler);
+roomRouter.get("/available", validateQueryParams(getAvailableRoomsValidationschema),findbyroomCategoryIdAndDaterangeHandler);
+roomRouter.post("/updatebooking", validateRequestBody(updatebookingValidationschema), updatebookingHandler);
 
 export default roomRouter;

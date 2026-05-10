@@ -60,7 +60,7 @@ export class RoomRepository extends BaseRepository<Room> {
     roomCategoryId: number,
     startDate: Date,
     endDate: Date
-) {
+    ) {
     return await this.model.findAll({
         where: {
             roomCategoryId,
@@ -72,6 +72,20 @@ export class RoomRepository extends BaseRepository<Room> {
         }
     });
 }
+
+    async updateBookingIdForDateRange(bookingId:number,roomIds:number[]){
+        return await this.model.update(
+            { bookingId },
+            {
+                where: {
+                    id: {
+                        [Op.in]: roomIds
+                    },
+                    deletedAt: null
+                }
+            }
+        );
+    }
 }
 
 
