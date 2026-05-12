@@ -6,6 +6,7 @@ import (
 	"ReviewService/utils"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -45,6 +46,19 @@ func (rc *ReviewController) GetReviewById(w http.ResponseWriter, r *http.Request
 func (rc *ReviewController) CreateReview(w http.ResponseWriter, r *http.Request) {
 	payload := r.Context().Value("payload").(dto.CreateReviewRequestDTO)
 
+	userIdStr := r.Header.Get("X-User-Id")
+	if userIdStr == "" {
+		utils.WriteJsonErrorResponse(w, http.StatusUnauthorized, "Unauthorized", fmt.Errorf("missing user identity"))
+		return
+	}
+
+	userId, err := strconv.ParseInt(userIdStr, 10, 64)
+	if err != nil {
+		utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Invalid User ID format", err)
+		return
+	}
+	payload.UserId = userId
+
 	fmt.Println("Payload received:", payload)
 
 	review, err := rc.ReviewService.CreateReview(&payload)
@@ -67,11 +81,18 @@ func (rc *ReviewController) UpdateReview(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	userIdStr := r.Header.Get("X-User-Id")
+	userRole := r.Header.Get("X-User-Role")
+	if userIdStr == "" {
+		utils.WriteJsonErrorResponse(w, http.StatusUnauthorized, "Unauthorized", fmt.Errorf("missing user identity"))
+		return
+	}
+
 	payload := r.Context().Value("payload").(dto.UpdateReviewRequestDTO)
 
 	fmt.Println("Payload received:", payload)
 
-	review, err := rc.ReviewService.UpdateReview(reviewId, &payload)
+	review, err := rc.ReviewService.UpdateReview(reviewId, &payload, userIdStr, userRole)
 
 	if err != nil {
 		utils.WriteJsonErrorResponse(w, http.StatusInternalServerError, "Failed to update review", err)
@@ -91,7 +112,14 @@ func (rc *ReviewController) DeleteReview(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err := rc.ReviewService.DeleteReview(reviewId)
+	userIdStr := r.Header.Get("X-User-Id")
+	userRole := r.Header.Get("X-User-Role")
+	if userIdStr == "" {
+		utils.WriteJsonErrorResponse(w, http.StatusUnauthorized, "Unauthorized", fmt.Errorf("missing user identity"))
+		return
+	}
+
+	err := rc.ReviewService.DeleteReview(reviewId, userIdStr, userRole)
 
 	if err != nil {
 		utils.WriteJsonErrorResponse(w, http.StatusInternalServerError, "Failed to delete review", err)
