@@ -74,7 +74,7 @@ func (rc *RoleController) GetRoleById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if role == nil {
-		utils.WriteJsonErrorResponse(w, http.StatusNotFound, "Role not found", fmt.Errorf("role with ID %d not found", roleId))
+		utils.WriteJsonErrorResponse(w, http.StatusNotFound, "Role not found", fmt.Errorf("role with ID %d not found", id))
 		return
 	}
 

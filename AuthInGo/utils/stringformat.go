@@ -12,3 +12,11 @@ func FormatRoles(roles []string) string {
 	}
 	return strings.Join(output, ",")
 }
+
+// It converts:
+
+// []string{"ADMIN", "USER"}
+
+// into:
+
+// "ADMIN","USER"

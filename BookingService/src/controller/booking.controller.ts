@@ -3,7 +3,12 @@ import { confirmBookingservice, createBookingservice } from "../services/booking
 import { addEmailToQueue } from "../producers/email.producer"
 
 export const createBookingController = async (req: Request, res: Response) => {
-    const Booking = await createBookingservice(req.body)
+    const userId = Number(req.header('X-User-ID'));
+    if (!userId) {
+        res.status(401).json({ error: "Missing or invalid user identity" });
+        return;
+    }
+    const Booking = await createBookingservice({ ...req.body, userId })
     res.status(201).json({
         bookingId : Booking.bookingId,
         idempotencyKey : Booking.idempotencyKey

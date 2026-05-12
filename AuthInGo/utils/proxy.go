@@ -17,7 +17,7 @@ func ProxyToService(targetBaseUrl string, pathPrefix string) http.HandlerFunc {
 		return nil
 	}
 
-	proxy := httputil.NewSingleHostReverseProxy(target)
+	proxy := httputil.NewSingleHostReverseProxy(target) // making a reverse proxy 
 
 	originalDirector := proxy.Director
 
@@ -35,6 +35,13 @@ func ProxyToService(targetBaseUrl string, pathPrefix string) http.HandlerFunc {
 
 		if userId, ok := r.Context().Value("userID").(string); ok {
 			r.Header.Set("X-User-ID", userId)
+		}
+		if email, ok := r.Context().Value("email").(string); ok {
+		r.Header.Set("X-User-Email", email)
+		}
+
+		if role, ok := r.Context().Value("role").(string); ok {
+		r.Header.Set("X-User-Role", role)
 		}
 
 	}
