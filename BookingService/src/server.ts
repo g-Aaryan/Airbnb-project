@@ -20,14 +20,4 @@ app.use(genericErrorHandler);
 
 app.listen(serverconfig.PORT,()=>{
     logger.info(`server is listening on the port ${serverconfig.PORT}`);
-  
-        addEmailToQueue({
-            to: "coderh70@gmail.com",
-            subject: "Sample Email booking",
-            templateId: "welcome",
-            params: {
-                name: "John Doe",
-                appName: "Booking Service"
-            }
-        })
 })

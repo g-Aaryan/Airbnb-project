@@ -15,6 +15,10 @@ export const updatebooking = async (bookingId: number, roomIds: number[]) => {
     const response = await axios.post(`${serverconfig.HOTEL_SERVICE_URL}/rooms/updatebooking`, {
         bookingId,
         roomIds
+    }, {
+        headers: {
+            'X-Internal-Service-Token': process.env.INTERNAL_SERVICE_TOKEN || 'internal-secret-token'
+        }
     });
     return response.data;
 }
