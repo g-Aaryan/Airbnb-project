@@ -47,17 +47,19 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
 
 		userId, okId := claims["id"].(float64)
 		email, okEmail := claims["email"].(string)
+		role, okRole := claims["role"].(string)
 
-		if !okId || !okEmail {
+		if !okId || !okEmail || !okRole {
 			http.Error(w, "Invalid token claims", http.StatusUnauthorized)
 			return
 		}
 
-		fmt.Println("Authenticated user ID:", int64(userId), "Email:", email)
+		fmt.Println("Authenticated user ID:", int64(userId), "Email:", email, "Role:", role)
 
 		ctx := context.WithValue(r.Context(), "userID", strconv.FormatFloat(userId, 'f', 0, 64)) // store user id as string in context 
 		// (just the conversion of float64 to string)
 		ctx = context.WithValue(ctx, "email", email) // store email in context
+		ctx = context.WithValue(ctx, "role", role) // store role in context
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 		

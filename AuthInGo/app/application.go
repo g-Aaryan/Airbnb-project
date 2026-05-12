@@ -60,7 +60,7 @@ func (app *Application) Run() error {
 	rr := repo.NewRoleRepository(db)
 	rpr := repo.NewRolePermissionRepository(db)
 	urr := repo.NewUserRoleRepository(db)
-	us := services.NewUserService(ur)
+	us := services.NewUserService(ur, urr)
 	rs := services.NewRoleService(rr, rpr, urr)
 	uc := controllers.NewUserController(us)
 	rc := controllers.NewRoleController(rs)

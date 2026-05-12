@@ -8,6 +8,7 @@ import (
 	"AuthInGo/models"
 	"github.com/golang-jwt/jwt/v5"
 	env "AuthInGo/config/env"
+	"time"
 )
 
 type UserService interface {
@@ -17,12 +18,14 @@ type UserService interface {
 }
 
 type UserServiceImpl struct {
-	userRepository db.UserRepository
+	userRepository     db.UserRepository
+	userRoleRepository db.UserRoleRepository
 } // here the type is userrepo interface and any struct that implement the userrepo interface can be used here and we can easily swap the implementation if needed in the future without changing the service layer code.
 
-func NewUserService(_userRepository db.UserRepository) UserService {
+func NewUserService(_userRepository db.UserRepository, _userRoleRepository db.UserRoleRepository) UserService {
 	return &UserServiceImpl{
-		userRepository: _userRepository,
+		userRepository:     _userRepository,
+		userRoleRepository: _userRoleRepository,
 	}
 } // this is di here loose coupling between service and repository layer and we can easily swap the implementation if needed in the future without changing the service layer code.
 
@@ -77,9 +80,24 @@ func (u *UserServiceImpl) LoginUser(payload *dto.LoginUserRequestDTO) (string, e
 		return "", fmt.Errorf("invalid password")
 	}
 
-		jwtpayload := jwt.MapClaims{
+	roles, err := u.userRoleRepository.GetUserRoles(user.Id)
+	if err != nil {
+		fmt.Println("Error fetching user roles:", err)
+		return "", fmt.Errorf("error fetching user roles")
+	}
+
+	var roleNames []string
+	for _, r := range roles {
+		roleNames = append(roleNames, r.Name)
+	}
+
+	roleStr := utils.FormatRoles(roleNames)
+
+	jwtpayload := jwt.MapClaims{
 		"email": user.Email,
 		"id":    user.Id,
+		"role":  roleStr,
+		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	}
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtpayload) 
