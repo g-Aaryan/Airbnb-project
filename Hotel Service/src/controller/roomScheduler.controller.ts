@@ -2,12 +2,21 @@ import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { startScheduler, stopScheduler, getSchedulerStatus, manualExtendAvailability } from "../scheduler/room.scheduler";
 import logger from "../config/logger.config";
+import { UnauthorizedError } from "../utils/errors/app.error";
+
+function isAdmin(req: Request): boolean {
+    const role = req.header('X-User-Role') || '';
+    return role.includes('ADMIN') || role.includes('admin');
+}
 
 /**
  * Start the room availability extension scheduler
  */
 export async function startSchedulerHandler(req: Request, res: Response) {
     try {
+        if (!isAdmin(req)) {
+            throw new UnauthorizedError("Only admins can start the scheduler");
+        }
         startScheduler();
         
         res.status(StatusCodes.OK).json({
@@ -32,6 +41,9 @@ export async function startSchedulerHandler(req: Request, res: Response) {
  */
 export async function stopSchedulerHandler(req: Request, res: Response) {
     try {
+        if (!isAdmin(req)) {
+            throw new UnauthorizedError("Only admins can stop the scheduler");
+        }
         stopScheduler();
         
         res.status(StatusCodes.OK).json({
@@ -56,6 +68,9 @@ export async function stopSchedulerHandler(req: Request, res: Response) {
  */
 export async function getSchedulerStatusHandler(req: Request, res: Response) {
     try {
+        if (!isAdmin(req)) {
+            throw new UnauthorizedError("Only admins can view the scheduler status");
+        }
         const status = getSchedulerStatus();
         
         res.status(StatusCodes.OK).json({
@@ -78,6 +93,9 @@ export async function getSchedulerStatusHandler(req: Request, res: Response) {
  */
 export async function manualExtendAvailabilityHandler(req: Request, res: Response) {
     try {
+        if (!isAdmin(req)) {
+            throw new UnauthorizedError("Only admins can manually extend availability");
+        }
         await manualExtendAvailability();
         
         res.status(StatusCodes.OK).json({
