@@ -38,4 +38,17 @@ export class HotelRepository extends BaseRepository<Hotel> {
         return true;
     }
 
+    async update(id: number, data: Partial<Hotel>) {
+        const hotel = await Hotel.findByPk(id);
+
+        if (!hotel || hotel.deletedAt) {
+            logger.error(`Hotel not found: ${id}`);
+            throw new NotFoundError(`Hotel with id ${id} not found`);
+        }
+
+        await hotel.update(data);
+        logger.info(`Hotel updated: ${hotel.id}`);
+        return hotel;
+    }
+
 }

@@ -7,3 +7,11 @@ export const hotelSchema = z.object({
     rating : z.number().optional(),
     ratingCount : z.number().optional(),
 });
+
+export const updateHotelSchema = z.object({
+    name : z.string().min(1).optional(),
+    address : z.string().min(1).optional(),
+    location : z.string().min(1).optional(),
+    rating : z.number().optional(),
+    ratingCount : z.number().optional(),
+});
